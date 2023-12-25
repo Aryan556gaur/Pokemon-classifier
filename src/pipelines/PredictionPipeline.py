@@ -22,8 +22,14 @@ class Prediction_pipeline:
             preprocessor_obj = load_object(file_path=preprocessor_path)
             model_obj = load_object(file_path=model_path)
 
+            features["hasMegaEvolution"] = features["hasMegaEvolution"].map(lambda x: 1 if x else 0)
             x = preprocessor_obj.transform(features)
             y = model_obj.predict(x)
+            
+            if y==1:
+                y="Legendary"
+            else:
+                y="Not Legendary"
 
             return y
 
@@ -31,9 +37,8 @@ class Prediction_pipeline:
             raise CustomException(e,sys)
         
 class CustomData:
-    def __init__(self, Type_1, Total, HP, Attack, Defense, Sp_Atk, Sp_Def, Speed, Generation, Color, hasGender, 
-                 Pr_Male, Egg_Group_1,hasMegaEvolution, Height_m, Weight_kg, Catch_Rate,Body_Style):
-        self.Type_1 = Type_1
+    def __init__(self, Total, HP, Attack, Defense, Sp_Atk, Sp_Def, Speed, hasMegaEvolution, Height_m, Weight_kg, Catch_Rate):
+
         self.Total = Total
         self.HP = HP
         self.Attack = Attack
@@ -41,24 +46,17 @@ class CustomData:
         self.Sp_Atk = Sp_Atk
         self.Sp_Def = Sp_Def
         self.Speed = Speed
-        self.Generation = Generation
-        self.Color = Color
-        self.hasGender = hasGender
-        self.Pr_Male = Pr_Male
-        self.Egg_Group_1 = Egg_Group_1
         self.hasMegaEvolution = hasMegaEvolution
         self.Height_m = Height_m
         self.Weight_kg = Weight_kg
         self.Catch_Rate = Catch_Rate
-        self.Body_Style = Body_Style
 
     def get_data_as_dataframe(self):
         try:
-            custom_data_input_dict = {"Type_1":[self.Type_1], "Total":[self.Total], "HP":[self.HP], 
-                "Attack":[self.Attack], "Defense":[self.Defense], "Sp_Atk":[self.Sp_Atk], "Sp_Def":[self.Sp_Def],
-                "Speed":[self.Speed], "Generation":[self.Generation], "Color":[self.Color], "hasGender":[self.hasGender], 
-                "Pr_Male":[self.Pr_Male], "Egg_Group_1":[self.Egg_Group_1],"hasMegaEvolution":[self.hasMegaEvolution],
-                "Height_m":[self.Height_m], "Weight_kg":[self.Weight_kg], "Catch_Rate":[self.Catch_Rate],"Body_Style":[self.Body_Style]}
+            custom_data_input_dict = {"Total":[self.Total], "HP":[self.HP], "Attack":[self.Attack], 
+                "Defense":[self.Defense], "Sp_Atk":[self.Sp_Atk], "Sp_Def":[self.Sp_Def],"Speed":[self.Speed], 
+                "hasMegaEvolution":[self.hasMegaEvolution],"Height_m":[self.Height_m], "Weight_kg":[self.Weight_kg], 
+                "Catch_Rate":[self.Catch_Rate]}
             
             df = pd.DataFrame(custom_data_input_dict)
 
@@ -86,7 +84,7 @@ class Batch_prediction:
         df = pd.read_csv(input_file_path)
 
         for col in df.columns:
-            if col in ["Number","Egg_group_2","Type_2"]:
+            if col in ["Number","Name","Egg_group_2","Type_2","Type_1","Egg_Group_1","Body_Style","Color","Generation","hasGender","Pr_Male"]:
                 df.drop(col,axis=1,inplace=True)
 
         preprocessor_path = os.path.join("artifacts", "Preprocessor.pkl")
@@ -94,6 +92,8 @@ class Batch_prediction:
 
         preprocessor = load_object(preprocessor_path)
         model = load_object(model_path)
+
+        df["hasMegaEvolution"] = df["hasMegaEvolution"].map(lambda x: 1 if x else 0)
 
         x = preprocessor.transform(df)
         y = model.predict(x)

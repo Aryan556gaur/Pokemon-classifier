@@ -31,6 +31,7 @@ class DataIngestion:
             df.to_csv(self.ingestion_config.Raw_data_path)
 
             df = df.drop(labels=df.columns[df.isna().sum() > 0.25*len(df)], axis=1)
+            df.drop(labels=["Name","Number","Type_1","Egg_Group_1","Body_Style","Color","Generation","hasGender","Pr_Male"],axis=1,inplace=True)
 
             x_train, x_test = train_test_split(df,test_size=0.25,random_state=42)
 
