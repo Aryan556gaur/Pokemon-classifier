@@ -1,5 +1,7 @@
-from flask import Flask,request,render_template,jsonify
-from src.pipelines.PredictionPipeline import Prediction_pipeline,CustomData
+from flask import Flask,request,render_template,jsonify,send_file
+from src.pipelines.PredictionPipeline import Prediction_pipeline,CustomData,Batch_prediction
+from src.exception import CustomException
+import os,sys
 
 
 application=Flask(__name__)
@@ -45,6 +47,23 @@ def predict_datapoint():
 
         return render_template('form.html',final_result=results)
     
+@app.route('/predict_file',methods=['Get','Post'])
+
+def predict_file():
+
+    try:
+        if request.method=="Post":
+            prediction_obj = Batch_prediction(request)
+            data = prediction_obj.save_data()
+            Prediction_path = prediction_obj.initiate_file_prediction(data)
+
+            return send_file(path_or_file=Prediction_path,download_name=Prediction_path,as_attachment=True)
+        
+        else:
+            return render_template('uploadfile.html')
+
+    except Exception as e:
+        raise CustomException(e,sys)
 
 if __name__=="__main__":
     app.run(host='0.0.0.0',debug=True)
