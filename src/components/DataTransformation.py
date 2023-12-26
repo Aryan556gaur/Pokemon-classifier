@@ -64,6 +64,8 @@ class DataTransformation:
                 if col=="Unnamed: 0":
                     x_test.drop(col,axis=1,inplace=True)
 
+            os.makedirs(self.transformation_config.Preprocessor_path,exist_ok=True)
+
             preprocessor_obj = self.get_preprocessor_obj()
             x_train_transformed = preprocessor_obj.fit_transform(x_train)
             x_test_transformed = preprocessor_obj.transform(x_test)
