@@ -27,9 +27,9 @@ class Prediction_pipeline:
             y = model_obj.predict(x)
             
             if y==1:
-                y="Legendary"
+                y="The Pokemon is Legendary"
             else:
-                y="Not Legendary"
+                y="The Pokemon is Not Legendary"
 
             return y
 
