@@ -25,8 +25,6 @@ class DataIngestion:
             df = pd.read_csv("notebook\pokemon_alopez247.csv")
 
             os.makedirs(os.path.dirname(self.ingestion_config.Raw_data_path), exist_ok=True)
-            os.makedirs(os.path.dirname(self.ingestion_config.Train_data_path), exist_ok=True)
-            os.makedirs(os.path.dirname(self.ingestion_config.Test_data_path), exist_ok=True)
 
             df.to_csv(self.ingestion_config.Raw_data_path)
 

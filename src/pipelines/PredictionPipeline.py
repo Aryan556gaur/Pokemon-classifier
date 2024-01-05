@@ -3,6 +3,7 @@ import pandas as pd
 from src.logger import logging
 from src.exception import CustomException
 from src.utils import load_object
+from flask import request,Request
 from dataclasses import dataclass
 
 @dataclass
@@ -27,9 +28,9 @@ class Prediction_pipeline:
             y = model_obj.predict(x)
             
             if y==1:
-                y="Legendary"
+                y="The Pokemon is Legendary 😃"
             else:
-                y="Not Legendary"
+                y="The Pokemon is Not Legendary 🙁"
 
             return y
 

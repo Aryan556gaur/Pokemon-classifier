@@ -1,5 +1,6 @@
-from flask import Flask,request,render_template,jsonify,send_file
+from flask import Flask,request,render_template,jsonify,send_file,Request
 from src.pipelines.PredictionPipeline import Prediction_pipeline,CustomData,Batch_prediction
+from src.pipelines.TrainingPipeline import Training_pipeline
 from src.exception import CustomException
 import os,sys
 
@@ -33,11 +34,13 @@ def predict_datapoint():
             Catch_Rate = float(request.form.get('Catch_Rate')),
         )
         final_new_data=data.get_data_as_dataframe()
-        predict_pipeline=Prediction_pipeline()
+        predict_pipeline = Prediction_pipeline()
+        train_pipeline = Training_pipeline()
         
+        train_pipeline.run_training_pipeline()
         pred=predict_pipeline.initiate_prediction(final_new_data)
 
-        results=pred[0]
+        results=pred
 
         return render_template('form.html',final_result=results)
     
@@ -47,6 +50,10 @@ def predict_file():
 
     try:
         if request.method=="Post":
+
+            train_pipeline = Training_pipeline()
+            train_pipeline.run_training_pipeline()
+            
             prediction_obj = Batch_prediction(request)
             data = prediction_obj.save_data()
             Prediction_path = prediction_obj.initiate_file_prediction(data)
