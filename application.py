@@ -1,4 +1,4 @@
-from flask import Flask,request,render_template,jsonify,send_file,Request
+from flask import Flask,request,render_template,send_file
 from src.pipelines.PredictionPipeline import Prediction_pipeline,CustomData,Batch_prediction
 from src.pipelines.TrainingPipeline import Training_pipeline
 from src.exception import CustomException
@@ -44,12 +44,12 @@ def predict_datapoint():
 
         return render_template('form.html',final_result=results)
     
-@app.route('/predict_file',methods=['Get','Post'])
+@app.route('/predict_file',methods=['GET','POST'])
 
 def predict_file():
 
     try:
-        if request.method=="Post":
+        if request.method=="POST":
 
             train_pipeline = Training_pipeline()
             train_pipeline.run_training_pipeline()

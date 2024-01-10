@@ -3,7 +3,7 @@ import pandas as pd
 from src.logger import logging
 from src.exception import CustomException
 from src.utils import load_object
-from flask import request,Request
+from flask import request
 from dataclasses import dataclass
 
 @dataclass
@@ -75,8 +75,9 @@ class Batch_prediction:
         self.prediction_config = Prediction_pipeline_config()
 
     def save_data(self):
-        input_file = self.request.files["file"]
-        input_file_path = os.makedirs(os.path.join("input_data",input_file.filename),exist_ok=True)
+        input_file = self.request.files['file']
+        input_file_path = os.path.join("input_data", input_file.filename)
+        os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
         input_file.save(input_file_path)
 
         return input_file_path
@@ -85,7 +86,7 @@ class Batch_prediction:
         df = pd.read_csv(input_file_path)
 
         for col in df.columns:
-            if col in ["Number","Name","Egg_group_2","Type_2","Type_1","Egg_Group_1","Body_Style","Color","Generation","hasGender","Pr_Male"]:
+            if col in ["Number","Name","Egg_Group_2","Type_2","Type_1","Egg_Group_1","Body_Style","Color","Generation","Unnamed: 0","hasGender","Pr_Male","isLegendary"]:
                 df.drop(col,axis=1,inplace=True)
 
         preprocessor_path = os.path.join("artifacts", "Preprocessor.pkl")
@@ -100,12 +101,12 @@ class Batch_prediction:
         y = model.predict(x)
 
         df["Target"] = [i for i in y]
-        df["Target"] = df["Target"].map({1:"yes",0:"no"})
+        df["Target"] = df["Target"].map({1:True,0:False})
 
-        predicted_file_path = os.makedirs(self.prediction_config.prediction_output_path,exist_ok=True)
-        df.to_csv(predicted_file_path)
+        os.makedirs(os.path.dirname(self.prediction_config.prediction_output_path),exist_ok=True)
+        df.to_csv(self.prediction_config.prediction_output_path)
 
-        return predicted_file_path
+        return self.prediction_config.prediction_output_path
 
 
 
