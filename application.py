@@ -13,8 +13,17 @@ app=application
 def home_page():
     return render_template('index.html')
 
+@app.route('/train')
+def train_data():
+    try:
+        train_pipeline = Training_pipeline()
+        train_pipeline.run_training_pipeline()
+        
+        return render_template('index1.html')
+    except Exception as e:
+        raise CustomException(e,sys)
+        
 @app.route('/predict',methods=['GET','POST'])
-
 def predict_datapoint():
     if request.method=='GET':
         return render_template('form.html')
@@ -35,9 +44,7 @@ def predict_datapoint():
         )
         final_new_data=data.get_data_as_dataframe()
         predict_pipeline = Prediction_pipeline()
-        train_pipeline = Training_pipeline()
-        
-        train_pipeline.run_training_pipeline()
+
         pred=predict_pipeline.initiate_prediction(final_new_data)
 
         results=pred
@@ -50,9 +57,6 @@ def predict_file():
 
     try:
         if request.method=="POST":
-
-            train_pipeline = Training_pipeline()
-            train_pipeline.run_training_pipeline()
             
             prediction_obj = Batch_prediction(request)
             data = prediction_obj.save_data()
